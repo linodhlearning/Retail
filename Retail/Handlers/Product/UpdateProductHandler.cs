@@ -7,21 +7,21 @@ using Retail.Utils;
 
 namespace Retail.Handlers.Product
 {
-    public class  UpdateProductHandler : BaseMessageHandler< UpdateProductRequest,  UpdateProductResponse>
+    public class UpdateProductHandler : BaseMessageHandler<UpdateProductRequest, UpdateProductResponse>
     {
-        private readonly ILogger< UpdateProductHandler> _logger;
+        private readonly ILogger<UpdateProductHandler> _logger;
         private readonly RepoUow _repo;
         private readonly IMapper _mapper;
         private ProductEntity _product;
 
-        public  UpdateProductHandler(ILogger< UpdateProductHandler> logger, RepoUow repo, IMapper mapper) : base(logger)
+        public UpdateProductHandler(ILogger<UpdateProductHandler> logger, RepoUow repo, IMapper mapper) : base(logger)
         {
             _logger = logger;
             _repo = repo;
             _mapper = mapper;
         }
 
-        public override async Task<RetailInProcessResponse> ValidateMessage( UpdateProductRequest message)
+        public override async Task<RetailInProcessResponse> ValidateMessage(UpdateProductRequest message)
         {
             var errors = new List<ErrorModel>();
             var id = message.Model.Id;
@@ -39,17 +39,19 @@ namespace Retail.Handlers.Product
             return await Task.FromResult(new RetailInProcessResponse { Errors = errors });
         }
 
-        public override async Task< UpdateProductResponse> HandleMessage( UpdateProductRequest request)
+        public override async Task<UpdateProductResponse> HandleMessage(UpdateProductRequest request)
         {
             _logger.LogInformation(" UpdateProductHandler HandleMessage Begin");
-             _product=_mapper.Map<ProductEntity>(request.Model);
-             _product.ModifiedOn = DateTimeOffset.Now;
-             _product.ModifiedBy = HttpContextData.GetUser();
-            _repo.Product.Update(_product);
+            _product.Name = request.Model.Name;
+            _product.ProductType = request.Model.ProductType;
+            _product.UnitPrice = request.Model.UnitPrice;
+            _product.ModifiedOn = DateTimeOffset.Now;
+            _product.ModifiedBy = HttpContextData.GetUser();
+            //_repo.Product.Update(_product);
             _repo.Save();
-             var data = _mapper.Map<ProductModel>(_product);
+            var data = _mapper.Map<ProductModel>(_product);
             _logger.LogInformation("UpdateProductHandler HandleMessage End");
-            return await Task.FromResult(new  UpdateProductResponse(data));
+            return await Task.FromResult(new UpdateProductResponse(data));
         }
 
     }

@@ -26,7 +26,7 @@ namespace Retail.Utils
             using var serviceScope = app.ApplicationServices.GetService<IServiceScopeFactory>()?.CreateScope();
             var context = serviceScope?.ServiceProvider?.GetRequiredService<RetailDbContext>();
             if (context == null) return app;
-            context.Database.EnsureDeleted();
+            //context.Database.EnsureDeleted();
             context.Database.EnsureCreated();
           // context.Database.Migrate();
             return app;

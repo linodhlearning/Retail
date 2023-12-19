@@ -46,6 +46,7 @@ namespace Retail.Controllers
         }
 
         [HttpPost]
+        [Route("product")]
         public async Task<IActionResult> AddProduct([FromBody] ProductModel model)
         {
             try
@@ -62,6 +63,7 @@ namespace Retail.Controllers
         }
 
         [HttpPut]
+        [Route("product")]
         public async Task<IActionResult> UpdateProduct([FromBody] ProductModel model)
         {
             try
