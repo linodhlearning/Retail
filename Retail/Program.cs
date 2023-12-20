@@ -1,6 +1,5 @@
+using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Options;
 using Retail.AutoMapper;
 using Retail.Model;
 using Retail.Repository;
@@ -16,12 +15,23 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(ErrorModel).Assembly));
 
+builder.Services.AddApiVersioning(o =>
+{
+    o.AssumeDefaultVersionWhenUnspecified = true;
+    o.DefaultApiVersion = new Microsoft.AspNetCore.Mvc.ApiVersion(1, 0);
+    o.ReportApiVersions = true;
+    o.ApiVersionReader = ApiVersionReader.Combine(
+        //new QueryStringApiVersionReader("x-api-version"),
+        new HeaderApiVersionReader("x-api-Version"),
+        new MediaTypeApiVersionReader("ver"));
+}).AddVersionedApiExplorer(options =>
+    {
+        options.GroupNameFormat = "'v'VVV";
+        options.SubstituteApiVersionInUrl = true;
+    });
+builder.Services.AddDbContext<RetailDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DBConnectionString")));
 
-builder.Services.AddDbContext<RetailDbContext>(options =>
-  
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DBConnectionString")));
 
- 
 builder.Services.AddScoped<RepoUow>();
 
 builder.Services.AddAutoMapperSetup();
@@ -33,11 +43,11 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();  
+    app.UseSwaggerUI();
 
 }
 
-app.DbMigrate(); 
+app.DbMigrate();
 
 app.UseHttpsRedirection();
 
