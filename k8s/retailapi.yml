@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: retail-api
+  namespace: rtl
+spec:
+  selector:
+    matchLabels:
+      app: retail-api
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: retail-api
+    spec:
+      containers:
+      - name: retail-api
+        image: linodhcalendar/retail:latest
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: 80
+        env:
+        - name: ASPNETCORE_ENVIRONMENT
+          value: "Production"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: retail-api-public
+  namespace: rtl
+spec:
+  selector:
+    app: retail-api
+  type: LoadBalancer
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 80 
